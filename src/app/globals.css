@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+:root {
+  --estlc-navy: #003399;
+  --estlc-navy-deep: #002266;
+  --estlc-red: #e96363;
+  --estlc-ink: #0f172a;
+  --estlc-muted: #64748b;
+  --estlc-paper: #f4f7fb;
+  --estlc-card: #ffffff;
+  --estlc-line: #dbe3f0;
+  --estlc-gold: #c4a35a;
+}
+
+@theme inline {
+  --color-navy: var(--estlc-navy);
+  --color-navy-deep: var(--estlc-navy-deep);
+  --color-accent: var(--estlc-red);
+  --color-ink: var(--estlc-ink);
+  --color-muted: var(--estlc-muted);
+  --color-paper: var(--estlc-paper);
+  --color-card: var(--estlc-card);
+  --color-line: var(--estlc-line);
+  --color-gold: var(--estlc-gold);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--estlc-paper);
+  color: var(--estlc-ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--estlc-navy) 20%, white);
+}

@@ -1,3 +1,11 @@
 node_modules/
-data/db.json
-data/db.json.tmp
+.next/
+out/
+.env
+.env*.local
+prisma/*.db
+prisma/*.db-journal
+_legacy/
+data/
+*.log
+*.tsbuildinfo

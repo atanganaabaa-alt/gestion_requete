@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  DEMANDEUR
+  AGENT
+  RESPONSABLE
+  ADMIN
+}
+
+enum RequestStatus {
+  BROUILLON
+  SOUMISE
+  AFFECTEE
+  EN_COURS
+  EN_ATTENTE
+  RESOLUE
+  CLOTUREE
+  REJETEE
+  ANNULEE
+}
+
+enum Priority {
+  BASSE
+  NORMALE
+  HAUTE
+  URGENTE
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  nom          String
+  telephone    String?
+  role         Role      @default(DEMANDEUR)
+  serviceId    String?
+  service      Service?  @relation(fields: [serviceId], references: [id])
+  active       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  requestsCreated   Request[]       @relation("Demandeur")
+  requestsAssigned  Request[]       @relation("Agent")
+  comments          Comment[]
+  statusChanges     StatusHistory[]
+  notifications     Notification[]
+  auditLogs         AuditLog[]
+  ratings           Rating[]
+}
+
+model Service {
+  id          String     @id @default(cuid())
+  code        String     @unique
+  name        String
+  description String?
+  active      Boolean    @default(true)
+  categories  Category[]
+  users       User[]
+  requests    Request[]
+  createdAt   DateTime   @default(now())
+}
+
+model Category {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  name            String
+  description     String?
+  serviceId       String
+  service         Service  @relation(fields: [serviceId], references: [id])
+  slaHoursBasse   Int      @default(120)
+  slaHoursNormale Int      @default(72)
+  slaHoursHaute   Int      @default(48)
+  slaHoursUrgente Int      @default(24)
+  active          Boolean  @default(true)
+  requests        Request[]
+  createdAt       DateTime @default(now())
+}
+
+model Request {
+  id              String        @id @default(cuid())
+  numero          String        @unique
+  objet           String
+  description     String
+  status          RequestStatus @default(SOUMISE)
+  priority        Priority      @default(NORMALE)
+  demandeurId     String
+  demandeur       User          @relation("Demandeur", fields: [demandeurId], references: [id])
+  agentId         String?
+  agent           User?         @relation("Agent", fields: [agentId], references: [id])
+  serviceId       String
+  service         Service       @relation(fields: [serviceId], references: [id])
+  categoryId      String
+  category        Category      @relation(fields: [categoryId], references: [id])
+  dueAt           DateTime?
+  reponseFinale   String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  closedAt        DateTime?
+
+  comments     Comment[]
+  attachments  Attachment[]
+  history      StatusHistory[]
+  notifications Notification[]
+  rating       Rating?
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  requestId  String
+  request    Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  authorId   String
+  author     User     @relation(fields: [authorId], references: [id])
+  body       String
+  isInternal Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+model Attachment {
+  id           String   @id @default(cuid())
+  requestId    String
+  request      Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  filename     String
+  storedName   String
+  mimeType     String
+  sizeBytes    Int
+  uploadedAt   DateTime @default(now())
+}
+
+model StatusHistory {
+  id         String         @id @default(cuid())
+  requestId  String
+  request    Request        @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  fromStatus RequestStatus?
+  toStatus   RequestStatus
+  actorId    String
+  actor      User           @relation(fields: [actorId], references: [id])
+  note       String?
+  createdAt  DateTime       @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requestId String?
+  request   Request? @relation(fields: [requestId], references: [id], onDelete: SetNull)
+  title     String
+  body      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  actor     User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action    String
+  entity    String
+  entityId  String?
+  meta      String?
+  createdAt DateTime @default(now())
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  requestId String   @unique
+  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  score     Int
+  comment   String?
+  createdAt DateTime @default(now())
+}
