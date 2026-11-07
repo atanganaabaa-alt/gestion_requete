@@ -15,9 +15,11 @@ export default async function AdminLayout({
     <AppShell
       user={session.user}
       nav={[
-        { href: "/admin", label: "Administration" },
+        { href: "/admin", label: "Vue d’ensemble" },
+        { href: "/admin/utilisateurs", label: "Comptes" },
+        { href: "/admin/services", label: "Services" },
+        { href: "/admin/categories", label: "Catégories" },
         { href: "/agent", label: "Console agent" },
-        { href: "/espace", label: "Vue demandeur" },
       ]}
     >
       {children}

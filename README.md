@@ -29,6 +29,13 @@ Mot de passe : `Estlc2026!`
 | responsable@estlc.cm | Responsable GSI |
 | admin@estlc.cm | Administrateur |
 
+## État Sprint 2
+
+- Soumission avec pièces PDF/JPG/PNG (1 Ko–5 Mo, 5 max) et numéro `REQ-AAAA-#####`
+- Confirmation du numéro et téléchargement des pièces selon le rôle
+- Réinitialisation du mot de passe (lien local, SMTP au sprint 4)
+- Administration : comptes, services, catégories
+
 ## État Sprint 1
 
 - Auth inscription / connexion, rôles, espaces demandeur, agent et admin

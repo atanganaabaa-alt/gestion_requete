@@ -34,6 +34,11 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
           autoComplete="current-password"
         />
       </div>
+      <p className="text-right text-sm">
+        <Link href="/mot-de-passe-oublie" className="text-navy underline">
+          Mot de passe oublié
+        </Link>
+      </p>
       <FieldError message={state.message} />
       <Button type="submit" className="w-full" disabled={pending}>
         {pending ? "Connexion…" : "Se connecter"}

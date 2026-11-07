@@ -6,18 +6,22 @@ import { STATUS_LABELS } from "@/lib/workflow";
 
 export default async function RequeteDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ cree?: string }>;
 }) {
   const session = await auth();
   if (!session?.user) redirect("/connexion");
   const { id } = await params;
+  const created = (await searchParams).cree === "1";
 
   const request = await prisma.request.findFirst({
     where: { id, demandeurId: session.user.id },
     include: {
       category: true,
       service: true,
+      attachments: true,
       history: {
         orderBy: { createdAt: "asc" },
         include: { actor: { select: { nom: true } } },
@@ -34,6 +38,12 @@ export default async function RequeteDetailPage({
 
   return (
     <div className="space-y-6">
+      {created && (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+          Requête enregistrée. Votre numéro de suivi est{" "}
+          <span className="font-mono font-semibold">{request.numero}</span>. Conservez-le pour le suivi public.
+        </div>
+      )}
       <div>
         <div className="mb-2 flex flex-wrap items-center gap-2">
           <Badge value={request.status} label={STATUS_LABELS[request.status]} />
@@ -44,6 +54,24 @@ export default async function RequeteDetailPage({
           {request.category.name} · {request.service.name}
         </p>
       </div>
+
+      <section className="rounded-xl border border-line bg-card p-5">
+        <h2 className="font-medium">Pièces jointes</h2>
+        {request.attachments.length === 0 ? (
+          <p className="mt-2 text-sm text-muted">Aucune pièce.</p>
+        ) : (
+          <ul className="mt-2 space-y-2 text-sm">
+            {request.attachments.map((piece) => (
+              <li key={piece.id}>
+                <a className="text-navy underline" href={`/api/pieces/${piece.id}`}>
+                  {piece.filename}
+                </a>
+                <span className="text-muted"> · {Math.round(piece.sizeBytes / 1024)} Ko</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <section className="rounded-xl border border-line bg-card p-5">
         <h2 className="font-medium">Description</h2>

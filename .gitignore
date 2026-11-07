@@ -9,3 +9,4 @@ _legacy/
 data/
 *.log
 *.tsbuildinfo
+uploads/
