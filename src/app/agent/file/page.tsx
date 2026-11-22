@@ -13,6 +13,7 @@ const FILTERS: Array<RequestStatus | "TOUTES"> = [
   "EN_ATTENTE",
   "RESOLUE",
   "CLOTUREE",
+  "REJETEE",
 ];
 
 export default async function AgentFilePage({
@@ -73,8 +74,16 @@ export default async function AgentFilePage({
           <tbody>
             {requests.map((r) => (
               <tr key={r.id} className="border-b border-line last:border-0">
-                <td className="px-4 py-3 font-mono text-xs">{r.numero}</td>
-                <td className="px-4 py-3">{r.objet}</td>
+                <td className="px-4 py-3 font-mono text-xs">
+                  <Link href={`/agent/requetes/${r.id}`} className="text-navy underline">
+                    {r.numero}
+                  </Link>
+                </td>
+                <td className="px-4 py-3">
+                  <Link href={`/agent/requetes/${r.id}`} className="hover:underline">
+                    {r.objet}
+                  </Link>
+                </td>
                 <td className="px-4 py-3">{r.demandeur.nom}</td>
                 <td className="px-4 py-3 text-muted">{r.service.name}</td>
                 <td className="px-4 py-3">

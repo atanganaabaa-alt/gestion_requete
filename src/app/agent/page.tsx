@@ -54,14 +54,19 @@ export default async function AgentDashboardPage() {
         </div>
         <ul className="divide-y divide-line">
           {recent.map((r) => (
-            <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
-              <div>
-                <div className="font-medium">{r.objet}</div>
-                <div className="text-sm text-muted">
-                  {r.numero} · {r.demandeur.nom} · {r.category.name}
+            <li key={r.id}>
+              <Link
+                href={`/agent/requetes/${r.id}`}
+                className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 hover:bg-paper"
+              >
+                <div>
+                  <div className="font-medium">{r.objet}</div>
+                  <div className="text-sm text-muted">
+                    {r.numero} · {r.demandeur.nom} · {r.category.name}
+                  </div>
                 </div>
-              </div>
-              <Badge value={r.status} label={STATUS_LABELS[r.status]} />
+                <Badge value={r.status} label={STATUS_LABELS[r.status]} />
+              </Link>
             </li>
           ))}
           {recent.length === 0 && (

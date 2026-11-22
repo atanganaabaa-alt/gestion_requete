@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
+import { CommentForm } from "@/components/requests/comment-form";
 import { STATUS_LABELS } from "@/lib/workflow";
 
 export default async function RequeteDetailPage({
@@ -21,6 +22,7 @@ export default async function RequeteDetailPage({
     include: {
       category: true,
       service: true,
+      agent: { select: { nom: true } },
       attachments: true,
       history: {
         orderBy: { createdAt: "asc" },
@@ -36,12 +38,15 @@ export default async function RequeteDetailPage({
 
   if (!request) notFound();
 
+  const commentsOpen = !["CLOTUREE", "ANNULEE"].includes(request.status);
+
   return (
     <div className="space-y-6">
       {created && (
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
           Requête enregistrée. Votre numéro de suivi est{" "}
-          <span className="font-mono font-semibold">{request.numero}</span>. Conservez-le pour le suivi public.
+          <span className="font-mono font-semibold">{request.numero}</span>. Conservez-le pour le suivi
+          public.
         </div>
       )}
       <div>
@@ -52,6 +57,7 @@ export default async function RequeteDetailPage({
         <h1 className="font-display text-3xl">{request.objet}</h1>
         <p className="mt-1 text-sm text-muted">
           {request.category.name} · {request.service.name}
+          {request.agent ? ` · Agent : ${request.agent.nom}` : ""}
         </p>
       </div>
 
@@ -78,6 +84,37 @@ export default async function RequeteDetailPage({
         <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-ink/90">
           {request.description}
         </p>
+        {request.reponseFinale && (
+          <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
+            <strong>Réponse du service :</strong> {request.reponseFinale}
+          </div>
+        )}
+      </section>
+
+      <section className="rounded-xl border border-line bg-card p-5">
+        <h2 className="mb-4 font-medium">Commentaires</h2>
+        <ul className="mb-4 space-y-3">
+          {request.comments.map((c) => (
+            <li key={c.id} className="rounded-md border border-line bg-paper px-3 py-2 text-sm">
+              <div className="text-xs text-muted">
+                {c.author.nom} ·{" "}
+                {c.createdAt.toLocaleString("fr-FR", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
+              </div>
+              <p className="mt-1 whitespace-pre-wrap">{c.body}</p>
+            </li>
+          ))}
+          {request.comments.length === 0 && (
+            <li className="text-sm text-muted">Aucun commentaire pour l’instant.</li>
+          )}
+        </ul>
+        {commentsOpen ? (
+          <CommentForm requestId={request.id} />
+        ) : (
+          <p className="text-sm text-muted">Les commentaires sont fermés sur cette requête.</p>
+        )}
       </section>
 
       <section className="rounded-xl border border-line bg-card p-5">
@@ -85,9 +122,7 @@ export default async function RequeteDetailPage({
         <ol className="space-y-4 border-l-2 border-gold/50 pl-4">
           {request.history.map((h) => (
             <li key={h.id}>
-              <div className="text-sm font-medium">
-                {STATUS_LABELS[h.toStatus]}
-              </div>
+              <div className="text-sm font-medium">{STATUS_LABELS[h.toStatus]}</div>
               <div className="text-xs text-muted">
                 {h.actor.nom} ·{" "}
                 {h.createdAt.toLocaleString("fr-FR", {

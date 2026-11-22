@@ -29,6 +29,12 @@ Mot de passe : `Estlc2026!`
 | responsable@estlc.cm | Responsable GSI |
 | admin@estlc.cm | Administrateur |
 
+## État Sprint 3
+
+- File agent filtrable par statut, détail `/agent/requetes/[id]`
+- Affectation à soi, transitions de statut (workflow), clôture
+- Commentaires visibles demandeur ↔ agent + historique horodaté
+
 ## État Sprint 2
 
 - Soumission avec pièces PDF/JPG/PNG (1 Ko–5 Mo, 5 max) et numéro `REQ-AAAA-#####`
